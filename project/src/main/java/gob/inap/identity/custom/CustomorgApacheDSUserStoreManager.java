@@ -20,7 +20,7 @@ import org.wso2.carbon.user.core.profile.ProfileConfigurationManager;
  * @author Lucasian
  */
 public class CustomorgApacheDSUserStoreManager extends ApacheDSUserStoreManager{
-    private List<CustomUserStore> userStores = new ArrayList<CustomUserStore>();
+    private List<UserStore> userStores = new ArrayList<UserStore>();
     private UserStoresLoader loader = new UserStoresLoader();
 
     public CustomorgApacheDSUserStoreManager(RealmConfiguration realmConfig, ClaimManager claimManager, ProfileConfigurationManager profileManager) throws UserStoreException {
@@ -59,7 +59,7 @@ public class CustomorgApacheDSUserStoreManager extends ApacheDSUserStoreManager{
 
     private boolean multivalidate(String userName, String password) {
         boolean response = false;
-        for (CustomUserStore userStore : userStores) {
+        for (UserStore userStore : userStores) {
             if (userStore.validate(userName, password)) {
                 response = true;
             }

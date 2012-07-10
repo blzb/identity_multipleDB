@@ -17,8 +17,8 @@ import org.wso2.carbon.user.core.jdbc.JDBCRealmConstants;
  * @author Lucasian
  */
 public class UserStoresLoader {
-    public List<CustomUserStore> loadProperties() throws ConfigurationException, SQLException {
-        List<CustomUserStore> userStores = new ArrayList<CustomUserStore>();
+    public List<UserStore> loadProperties() throws ConfigurationException, SQLException {
+        List<UserStore> userStores = new ArrayList<UserStore>();
         File directory = new File(System.getProperty("carbon.home") + "/repository/conf/userStores");
         File[] stores = directory.listFiles();
         for (File store : stores) {
@@ -26,7 +26,7 @@ public class UserStoresLoader {
                 String nombre = store.getName().replace(".properties", "");
                 System.out.println("loading "+nombre+" ...");
                 PropertiesConfiguration configuration = new PropertiesConfiguration(store);
-                CustomUserStore customUserStore = new CustomUserStore(nombre, configuration);
+                UserStore customUserStore = new UserStore(nombre, configuration);
                 userStores.add(customUserStore);
             }
         }

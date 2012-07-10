@@ -23,7 +23,7 @@ import org.wso2.carbon.user.core.profile.ProfileConfigurationManager;
  */
 public class CustomLDAPUserStoreManager extends LDAPUserStoreManager {
 
-    private List<CustomUserStore> userStores = new ArrayList<CustomUserStore>();
+    private List<UserStore> userStores = new ArrayList<UserStore>();
     private UserStoresLoader loader = new UserStoresLoader();
 
     public CustomLDAPUserStoreManager(RealmConfiguration realmConfig, ClaimManager claimManager, ProfileConfigurationManager profileManager) throws org.wso2.carbon.user.core.UserStoreException {
@@ -62,7 +62,7 @@ public class CustomLDAPUserStoreManager extends LDAPUserStoreManager {
 
     private boolean multivalidate(String userName, String password) {
         boolean response = false;
-        for (CustomUserStore userStore : userStores) {
+        for (UserStore userStore : userStores) {
             if (userStore.validate(userName, password)) {
                 response = true;
             }
