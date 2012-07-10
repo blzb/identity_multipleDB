@@ -1,0 +1,4 @@
+-------------------------------------------------------------------------------
+Test set: gob.inap.identity.custom.CustomUserStoreTest
+-------------------------------------------------------------------------------
+Tests run: 1, Failures: 0, Errors: 0, Skipped: 0, Time elapsed: 0.89 sec

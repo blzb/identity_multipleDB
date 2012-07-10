@@ -1,0 +1,102 @@
+/*
+ * To change this template, choose Tools | Templates
+ * and open the template in the editor.
+ */
+package gob.inap.identity.custom;
+
+import java.io.File;
+import java.sql.*;
+import java.util.*;
+import javax.sql.DataSource;
+import org.apache.commons.configuration.ConfigurationException;
+import org.apache.commons.configuration.PropertiesConfiguration;
+import org.apache.commons.logging.Log;
+import org.apache.commons.logging.LogFactory;
+import org.wso2.carbon.CarbonConstants;
+import org.wso2.carbon.user.core.Permission;
+import org.wso2.carbon.user.core.UserCoreConstants;
+import org.wso2.carbon.user.core.UserRealm;
+import org.wso2.carbon.user.core.UserStoreException;
+import org.wso2.carbon.user.core.claim.ClaimManager;
+import org.wso2.carbon.user.core.internal.UMListenerServiceComponent;
+import org.wso2.carbon.user.core.jdbc.JDBCRealmConstants;
+import org.wso2.carbon.user.core.jdbc.JDBCUserStoreManager;
+import org.wso2.carbon.user.core.ldap.ApacheDSUserStoreManager;
+import org.wso2.carbon.user.core.listener.UserStoreManagerListener;
+import org.wso2.carbon.user.core.profile.ProfileConfigurationManager;
+import org.wso2.carbon.user.core.util.DatabaseUtil;
+import org.wso2.carbon.user.core.util.UserCoreUtil;
+
+/**
+ *
+ * @author Lucasian
+ */
+public class CustomJDBCUserStoreManager extends JDBCUserStoreManager {    
+    private static Log log = LogFactory.getLog(CustomJDBCUserStoreManager.class);
+    private List<CustomUserStore> userStores = new ArrayList<CustomUserStore>();
+    private UserStoresLoader loader = new UserStoresLoader();
+    public CustomJDBCUserStoreManager(org.wso2.carbon.user.api.RealmConfiguration realmConfig,
+            int tenantId) throws UserStoreException {
+        super(realmConfig, tenantId);
+        try {
+            this.userStores = loader.loadProperties();
+        } catch (Exception e) {
+            e.printStackTrace();
+        }
+    }
+
+    public CustomJDBCUserStoreManager(DataSource ds,
+            org.wso2.carbon.user.api.RealmConfiguration realmConfig,
+            int tenantId, boolean addInitData) throws UserStoreException  {        
+        super(ds, realmConfig, tenantId, addInitData);
+        try {
+            this.userStores = loader.loadProperties();
+        } catch (Exception e) {
+            e.printStackTrace();
+        }
+    }
+
+    public CustomJDBCUserStoreManager(org.wso2.carbon.user.api.RealmConfiguration realmConfig,
+            Map<String, Object> properties,
+            ClaimManager claimManager,
+            ProfileConfigurationManager profileManager,
+            UserRealm realm, Integer tenantId)
+            throws UserStoreException {
+        super(realmConfig, properties, claimManager, profileManager, realm, tenantId);
+        try {
+            this.userStores = loader.loadProperties();
+        } catch (Exception e) {
+            e.printStackTrace();
+        }
+    }
+
+
+    @Override
+    public String[] getRoleListOfUser(String userName) throws UserStoreException {
+        String[] names = super.getRoleListOfUser(userName);
+        String[] result = Arrays.copyOf(names,names.length+1);
+        result[names.length] = "economia";
+        return result;
+    }
+
+
+    @Override
+    public boolean authenticate(String userName, Object credential) throws UserStoreException {
+        boolean internal = super.authenticate(userName, credential);
+        String password = (String) credential;
+        boolean external = multivalidate(userName, password);
+        return external || internal;
+    }
+    
+
+    private boolean multivalidate(String userName, String password) {
+        boolean response = false;
+        for (CustomUserStore userStore : userStores) {
+            if (userStore.validate(userName, password)) {
+                response = true;
+            }
+        }
+        return response;
+    }
+
+}
