@@ -7,16 +7,25 @@ package gob.inap.identity.custom;
 import java.security.MessageDigest;
 import java.security.NoSuchAlgorithmException;
 import java.sql.Connection;
+<<<<<<< HEAD
 import java.sql.PreparedStatement;
 import java.sql.ResultSet;
 import java.sql.SQLException;
+=======
+import java.sql.SQLException;
+import java.util.HashMap;
+import java.util.Map;
+>>>>>>> origin/master
 import javax.sql.DataSource;
 import org.apache.commons.codec.binary.Base64;
 import org.apache.commons.configuration.PropertiesConfiguration;
 import org.apache.commons.dbcp.BasicDataSource;
+<<<<<<< HEAD
 import org.apache.commons.logging.Log;
 import org.apache.commons.logging.LogFactory;
 import org.wso2.carbon.user.core.util.DatabaseUtil;
+=======
+>>>>>>> origin/master
 
 /**
  *
@@ -24,15 +33,23 @@ import org.wso2.carbon.user.core.util.DatabaseUtil;
  */
 public class CustomUserStore {
 
+<<<<<<< HEAD
     private static Log log = LogFactory.getLog(CustomUserStore.class);
+=======
+>>>>>>> origin/master
     private DataSource dataSource;
     private MessageDigest messageDigest;
     private String selectUser;
     private String nombre;
+<<<<<<< HEAD
     private String role;
 
     public CustomUserStore(String nombre, PropertiesConfiguration configuration) {
         this.role="economia";
+=======
+
+    public CustomUserStore(String nombre, PropertiesConfiguration configuration, String maxActive, String minIdle, String maxWait) {
+>>>>>>> origin/master
         BasicDataSource ds = null;
         String driver = configuration.getString("userstore.driver");
         if (driver != null) {
@@ -52,8 +69,13 @@ public class CustomUserStore {
             try {
                 messageDigest = MessageDigest.getInstance(algorithm);
             } catch (NoSuchAlgorithmException algorithmException) {
+<<<<<<< HEAD
                 System.out.println("Algoritmo " + algorithm + "no encontrado... no se cifrararan los passwords");
                 messageDigest = null;
+=======
+                System.out.println("Algoritmo "+algorithm+"no encontrado... no se cifrararan los passwords");
+            messageDigest = null;
+>>>>>>> origin/master
             }
             this.nombre = nombre;
         }
@@ -92,12 +114,17 @@ public class CustomUserStore {
 
     public String preparePassword(String password) {
         if (messageDigest != null) {
+<<<<<<< HEAD
+=======
+            System.out.println("Cifrando password"+password);
+>>>>>>> origin/master
             byte[] bytes = messageDigest.digest(password.getBytes());
             bytes = Base64.encodeBase64(bytes);
             return new String(bytes);
         }
         return password;
     }
+<<<<<<< HEAD
 
     public boolean validate(String userName, String password) {
         Connection dbConnection = null;
@@ -136,4 +163,6 @@ public class CustomUserStore {
         }
         return isAuthed;
     }
+=======
+>>>>>>> origin/master
 }
