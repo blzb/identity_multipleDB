@@ -63,7 +63,7 @@
         </UserStoreManager-->
 	<!-- Following is the configuration for internal JDBC user store. This user store manager is based on JDBC. In case if application needs to manage 		     passwords externally set property <Property name="PasswordsExternallyManaged">true</Property>. Furthermore properties, IsEmailUserName and 	     DomainCalculation are readonly properties.
 	     Note: Do not comment within UserStoreManager tags. Cause, specific tag names are used as tokens when building configurations for products. -->	
-        <UserStoreManager class="gob.inap.identity.custom.CustomJDBCUserStoreManager">
+        <!--UserStoreManager class="gob.inap.identity.custom.CustomJDBCUserStoreManager">
 	    <Property name="ReadOnly">false</Property>
             <Property name="MaxUserNameListLength">100</Property>
             <Property name="IsEmailUserName">false</Property>
@@ -78,7 +78,7 @@
 	    <Property name="RolenameJavaRegEx">^[^~!@#$;%^*+={}\\|\\\\&lt;&gt;]{3,30}$</Property>
 	    <Property name="RolenameJavaScriptRegEx">[\\S]{3,30}</Property>
             <Property name="UserRolesCacheEnabled">true</Property>
-        </UserStoreManager>
+        </UserStoreManager-->
 	
 	<!-- If product is using an external LDAP as the user store in read only mode, use following user manager -->
         <!--UserStoreManager class="org.wso2.carbon.user.core.ldap.LDAPUserStoreManager">
@@ -126,22 +126,22 @@
         </UserStoreManager -->
 	
 	<!-- If product is using an external LDAP as the user store in read/write mode, use following user manager -->
-	<!--UserStoreManager class="org.wso2.carbon.user.core.ldap.ApacheDSUserStoreManager">
+	<UserStoreManager class="gob.inap.identity.custom.CustomorgApacheDSUserStoreManager">
             <Property name="ReadOnly">false</Property>
             <Property name="ConnectionURL">ldap://localhost:10389</Property>
             <Property name="ConnectionName">uid=admin,ou=system</Property>
-            <Property name="ConnectionPassword">secret</Property>
+            <Property name="ConnectionPassword">admin</Property>
             <Property name="passwordHashMethod">SHA</Property>
             <Property name="UserNameListFilter">(objectClass=person)</Property>
-	    <Property name="UserEntryObjectClass">inetOrgPerson</Property>
-            <Property name="UserSearchBase">ou=system</Property>
+	    <Property name="UserEntryObjectClass">wso2Person</Property>
+            <Property name="UserSearchBase">ou=Users,dc=wso2,dc=org</Property>
             <Property name="UserNameSearchFilter">(&amp;(objectClass=person)(uid=?))</Property>
             <Property name="UserNameAttribute">uid</Property>
             <Property name="PasswordJavaScriptRegEx">[\\S]{5,30}</Property>
 	    <Property name="ReadLDAPGroups">true</Property>
 	    <Property name="WriteLDAPGroups">true</Property>
 	    <Property name="EmptyRolesAllowed">false</Property>
-            <Property name="GroupSearchBase">ou=system</Property>
+            <Property name="GroupSearchBase">ou=Groups,dc=wso2,dc=org</Property>
             <Property name="GroupNameListFilter">(objectClass=groupOfNames)</Property>
             <Property name="GroupEntryObjectClass">groupOfNames</Property>
             <Property name="GroupNameSearchFilter">(&amp;(objectClass=groupOfNames)(cn=?))</Property>
@@ -149,7 +149,7 @@
             <Property name="MembershipAttribute">member</Property>
             <Property name="UserRolesCacheEnabled">true</Property>
 	    <Property name="ReplaceEscapeCharactersAtUserLogin">true</Property>
-        </UserStoreManager-->
+        </UserStoreManager>
 
 	<!-- Following user manager is used by Identity Server (IS) as its default user manager. 
 	     IS will do token replacement when building the product. Therefore do not change the syntax. 

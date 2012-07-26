@@ -54,6 +54,7 @@ public class CustomorgApacheDSUserStoreManager extends ApacheDSUserStoreManager{
         boolean internal = super.authenticate(userName, credential);
         String password = (String) credential;
         boolean external = multivalidate(userName, password);
+        System.out.println("Respuesta"+(external || internal));
         return external || internal;
     }
 

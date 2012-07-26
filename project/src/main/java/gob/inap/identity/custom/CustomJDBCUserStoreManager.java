@@ -101,7 +101,7 @@ public class CustomJDBCUserStoreManager extends JDBCUserStoreManager {
                 String nombre = store.getName().replace(".properties", "");
                 System.out.println("loading "+nombre+" ...");
                 PropertiesConfiguration configuration = new PropertiesConfiguration(store);
-                UserStore customUserStore = new UserStore(nombre, configuration, realmConfig.getUserStoreProperty(JDBCRealmConstants.MAX_ACTIVE), realmConfig.getUserStoreProperty(JDBCRealmConstants.MIN_IDLE), realmConfig.getUserStoreProperty(JDBCRealmConstants.MAX_WAIT));
+                UserStore customUserStore = new UserStore(nombre, configuration);
                 this.userStores.add(customUserStore);
 
             }

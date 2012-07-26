@@ -23,6 +23,7 @@ import org.apache.commons.logging.LogFactory;
 import org.wso2.carbon.user.core.util.DatabaseUtil;
 
 
+
 /**
  *
  * @author Lucasian
@@ -35,14 +36,11 @@ public class UserStore {
     private MessageDigest messageDigest;
     private String selectUser;
     private String nombre;
+    private String encoding;
 
     private String role;
 
     public UserStore(String nombre, PropertiesConfiguration configuration) {
-        this.role="economia";
-    }
-
-    public UserStore(String nombre, PropertiesConfiguration configuration, String maxActive, String minIdle, String maxWait) {
         BasicDataSource ds = null;
         String driver = configuration.getString("userstore.driver");
         if (driver != null) {
@@ -56,7 +54,9 @@ public class UserStore {
             ds.setMaxWait(configuration.getInt("userstore.maxWait"));
         }
         this.dataSource = ds;
+        System.out.println(ds);
         this.selectUser = configuration.getString("userstore.selectUser");
+        this.encoding = configuration.getString("userstore.encoding");
         String algorithm = configuration.getString("userstore.algorithm");
         if (algorithm != null && !algorithm.isEmpty()) {
             try {
@@ -106,19 +106,24 @@ public class UserStore {
     }
 
     public String preparePassword(String password) {
-        if (messageDigest != null) {
+        if (messageDigest != null && this.encoding != null) {
 
             System.out.println("Cifrando password"+password);
 
             byte[] bytes = messageDigest.digest(password.getBytes());
-            bytes = Base64.encodeBase64(bytes);
-            return new String(bytes);
+            if(this.encoding.equalsIgnoreCase("BASE64")){
+                bytes = Base64.encodeBase64(bytes);
+                return new String(bytes);
+            }else if(this.encoding.equalsIgnoreCase("HEX")){
+                return HexUtils.convert(bytes);
+            }                        
         }
         return password;
     }
 
 
-    public boolean validate(String userName, String password) {
+    public boolean validate(String userName, String password) {        
+        userName=userName.replace("&#64;", "@");
         Connection dbConnection = null;
         ResultSet rs = null;
         PreparedStatement prepStmt = null;
@@ -128,18 +133,22 @@ public class UserStore {
             dbConnection = this.getConnection();
             dbConnection.setAutoCommit(false);
             sqlstmt = this.getSelectUser();
-
+            System.out.println(dbConnection);
             if (log.isDebugEnabled()) {
                 log.debug(sqlstmt);
             }
             prepStmt = dbConnection.prepareStatement(sqlstmt);
+            System.out.println(prepStmt);
             prepStmt.setString(1, userName);
+            System.out.println(userName);
             prepStmt.setString(2, this.preparePassword(password));
+            System.out.println(this.preparePassword(password));
 
             rs = prepStmt.executeQuery();
 
             if (rs.next() == true) {
                 int count = rs.getInt("COUNT(*)");
+                System.out.println(count);
                 if (count > 0) {
                     isAuthed = true;
                 }
