@@ -69,10 +69,10 @@ public class UserStoreTest {
         System.out.println("preparePassword");
         String password = "angel";
         UserStore instance = new UserStore(name, con);
-        String expResult = "";
+        String expResult = "c8a50f632c3c4baf27fc05facb1883104e1d16ef";
         String result = instance.preparePassword(password);
         System.out.println(result);
-        assertNotNull(result);
+        assertEquals(result,expResult);
     }
 
     /**
