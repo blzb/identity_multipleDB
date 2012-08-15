@@ -65,10 +65,6 @@ public class UserStore {
 
                 System.out.println("Algoritmo " + algorithm + "no encontrado... no se cifrararan los passwords");
                 messageDigest = null;
-
-                System.out.println("Algoritmo "+algorithm+"no encontrado... no se cifrararan los passwords");
-            messageDigest = null;
-
             }
             this.nombre = nombre;
         }
@@ -133,22 +129,17 @@ public class UserStore {
             dbConnection = this.getConnection();
             dbConnection.setAutoCommit(false);
             sqlstmt = this.getSelectUser();
-            System.out.println(dbConnection);
             if (log.isDebugEnabled()) {
                 log.debug(sqlstmt);
             }
             prepStmt = dbConnection.prepareStatement(sqlstmt);
-            System.out.println(prepStmt);
             prepStmt.setString(1, userName);
-            System.out.println(userName);
             prepStmt.setString(2, this.preparePassword(password));
-            System.out.println(this.preparePassword(password));
 
             rs = prepStmt.executeQuery();
 
             if (rs.next() == true) {
                 int count = rs.getInt("COUNT(*)");
-                System.out.println(count);
                 if (count > 0) {
                     isAuthed = true;
                 }

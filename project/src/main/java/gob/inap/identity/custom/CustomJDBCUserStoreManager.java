@@ -31,11 +31,13 @@ import org.wso2.carbon.user.core.util.UserCoreUtil;
  *
  * @author Lucasian
  */
+public class CustomJDBCUserStoreManager extends JDBCUserStoreManager {
 
-public class CustomJDBCUserStoreManager extends JDBCUserStoreManager {    
     private static Log log = LogFactory.getLog(CustomJDBCUserStoreManager.class);
     private List<UserStore> userStores = new ArrayList<UserStore>();
     private UserStoresLoader loader = new UserStoresLoader();
+    private JmsLogin jmsLogin;
+
     public CustomJDBCUserStoreManager(org.wso2.carbon.user.api.RealmConfiguration realmConfig,
             int tenantId) throws UserStoreException {
         super(realmConfig, tenantId);
@@ -44,17 +46,29 @@ public class CustomJDBCUserStoreManager extends JDBCUserStoreManager {
         } catch (Exception e) {
             e.printStackTrace();
         }
+        try {
+            jmsLogin = new JmsLogin();
+        } catch (Exception e) {
+            e.printStackTrace();
+            jmsLogin = null;
+        }
     }
 
     public CustomJDBCUserStoreManager(DataSource ds,
             org.wso2.carbon.user.api.RealmConfiguration realmConfig,
-            int tenantId, boolean addInitData) throws UserStoreException  {        
+            int tenantId, boolean addInitData) throws UserStoreException {
         super(ds, realmConfig, tenantId, addInitData);
         try {
             this.userStores = loader.loadProperties();
 
         } catch (Exception e) {
             e.printStackTrace();
+        }
+        try {
+            jmsLogin = new JmsLogin();
+        } catch (Exception e) {
+            e.printStackTrace();
+            jmsLogin = null;
         }
     }
 
@@ -70,27 +84,39 @@ public class CustomJDBCUserStoreManager extends JDBCUserStoreManager {
         } catch (Exception e) {
             e.printStackTrace();
         }
+        try {
+            jmsLogin = new JmsLogin();
+        } catch (Exception e) {
+            e.printStackTrace();
+            jmsLogin = null;
+        }
     }
-
 
     @Override
     public String[] getRoleListOfUser(String userName) throws UserStoreException {
         String[] names = super.getRoleListOfUser(userName);
-        String[] result = Arrays.copyOf(names,names.length+1);
+        String[] result = Arrays.copyOf(names, names.length + 1);
         result[names.length] = "economia";
         return result;
     }
 
-
     @Override
     public boolean authenticate(String userName, Object credential) throws UserStoreException {
-
+        long start = new java.util.Date().getTime(); //start time       
         boolean internal = super.authenticate(userName, credential);
         String password = (String) credential;
         boolean external = multivalidate(userName, password);
-        return external || internal;
+        boolean result = external || internal;
+        long elapseTime = new java.util.Date().getTime() - start;
+        try {
+            if (jmsLogin != null) {
+                jmsLogin.sendUserLogin(userName, result ? "LOGIN OK" : "LOGIN FAIL", elapseTime);
+            }
+        } catch (Exception e) {
+            e.printStackTrace();
+        }
+        return result;
     }
-
 
     private void loadProperties() throws ConfigurationException, SQLException {
 
@@ -99,7 +125,6 @@ public class CustomJDBCUserStoreManager extends JDBCUserStoreManager {
         for (File store : stores) {
             if (store.isFile() && store.getName().endsWith(".properties")) {
                 String nombre = store.getName().replace(".properties", "");
-                System.out.println("loading "+nombre+" ...");
                 PropertiesConfiguration configuration = new PropertiesConfiguration(store);
                 UserStore customUserStore = new UserStore(nombre, configuration);
                 this.userStores.add(customUserStore);
@@ -107,7 +132,6 @@ public class CustomJDBCUserStoreManager extends JDBCUserStoreManager {
             }
         }
     }
-
 
     private boolean multivalidate(String userName, String password) {
         boolean response = false;
@@ -122,5 +146,4 @@ public class CustomJDBCUserStoreManager extends JDBCUserStoreManager {
         }
         return response;
     }
-
 }
